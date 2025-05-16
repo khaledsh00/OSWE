@@ -1,0 +1,25 @@
+#1 — Initial Analysis
+Review and analyze the code
+@web.route('/')
+def index():
+    text = request.args.get('text')
+    if(text):
+        converted = spookify(text)
+        return render_template('index.html', output=converted)
+
+    return render_template('index.html', output='')
+
+
+
+Observations:
+
+A user-controlled parameter text is retrieved from the URL query string.
+
+This value is passed to the render_template() function, which renders index.html.
+
+This opens the possibility of Server-Side Template Injection (SSTI).
+
+Exploitation Steps:
+Test the injection using payloads like {{7*7}}. If this is evaluated to 49, SSTI is confirmed.
+
+If {{7*7}} is not evaluated, try $${{7*7}}
