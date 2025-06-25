@@ -2,6 +2,9 @@ import requests
 import sys
 from bs4 import BeautifulSoup
 import base64
+from urllib.parse import urljoin
+
+
 if len(sys.argv) != 2 :
     print(f"Please Usage of script ::: {sys.argv[0]} URL ")
     sys.exit(1)
@@ -10,10 +13,8 @@ url = sys.argv[1]
 
 if not url.startswith(("http://", "https://")):
     url = "http://" + url
-if not url.endswith("/about.html"):
-    if not url.endswith("/"):
-        url += "/"
-    url += "about.html"
+if not url.endswith("about.html"):
+    url = urljoin(url,"about.html")
 
 try:
     r = requests.get(url)
